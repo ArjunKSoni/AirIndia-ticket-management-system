@@ -16,18 +16,38 @@ def book_ticket(request):
         data = json.loads(request.body)
         print("data",data)
         try:
-            ticket = Ticket(
-                            passenger_id=data['passenger_id'], 
-                            plane_id=data['plane_id'], 
-                            source=data['source'], 
-                            destination=data['destination'], 
-                            date_of_journey=data['date_of_journey'], 
-                            time_of_journey=data['time_of_journey'], 
-                            status=data['status']
-                            )
-            ticket_number = ticket.save()
+            ticket_number = Ticket.insertSingle({
+                            "passenger_id":data['passenger_id'], 
+                            "plane_id":data['plane_id'], 
+                            "source":data['source'], 
+                            "destination":data['destination'], 
+                            "date_of_journey":data['date_of_journey'], 
+                            "time_of_journey":data['time_of_journey'], 
+                            "status":data['status']
+                            })
             return JsonResponse({"ticket_url":"http://127.0.0.1:8000/ticket/"+str(ticket_number)})
 
+        except Exception as e:
+            print(e)
+            return JsonResponse({"error":"internal server error"})
+        
+    elif request.method == 'PUT':
+        try:
+            data = json.loads(request.body)
+            resp=Ticket.updateOneById(data['ticket_id'],data['ticket'])
+            return JsonResponse({"status":resp.acknowledged})
+        except Exception as e:
+            print(e)
+            return JsonResponse({"error":"internal server error"})
+        
+    elif request.method == 'DELETE':
+        try:
+            data = json.loads(request.body)
+            acknowledge=Ticket.deleteOneById(data['ticket_id'])
+            if acknowledge:
+                return JsonResponse({"status":acknowledge})
+            else:
+                return JsonResponse({"status":False})
         except Exception as e:
             print(e)
             return JsonResponse({"error":"internal server error"})
@@ -38,8 +58,8 @@ def book_ticket(request):
 def get_ticket_details(request, id):
     if request.method == "GET":
         try:
-            ticket = json.loads(Ticket.get_ticket_by_id(id))
-            plane = json.loads(PlaneInfo.get_plane_by_id(ticket['plane_id']))
+            ticket = Ticket.findById(id)
+            plane = PlaneInfo.findById(ticket['plane_id'])
             user = User.objects.get(id=ticket['passenger_id'])
             
             return JsonResponse({"ticket":ticket,
@@ -53,6 +73,6 @@ def get_ticket_details(request, id):
                                 })
         except Exception as e:
             print(e)
-            return JsonResponse({"error":"internal server error"})
+            return JsonResponse({"error":"Internal server error"})
     
     return JsonResponse({"error":"method not supported"})

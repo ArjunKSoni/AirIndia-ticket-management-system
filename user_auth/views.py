@@ -109,9 +109,8 @@ def get_user(request, id):
 def get_ticket_by_userid(request):
     if request.method == 'GET':
         try:
-            tickets = json.loads(Ticket.get_ticket_by_passenger_id(request.user['id']))
+            tickets = Ticket.findByFilter({"passenger_id":request.user['id']})
             return JsonResponse({"tickets":tickets})
         except Exception as e:
-            print(e)
             return JsonResponse({"error":"internal server error"})
     return JsonResponse({"error":"method not supported"})
