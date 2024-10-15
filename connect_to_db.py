@@ -1,10 +1,6 @@
 import pymongo
 from bson import ObjectId
 
-# url="mongodb+srv://ArjunKSoni:Arjun6261@cluster0.zmp7n.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
-
-# db=client['airindia']
-
 class MongoHelper:
     def __init__(self):
         self.client = pymongo.MongoClient(host="127.0.0.1", port=27017, authSource="airindia")
@@ -24,11 +20,11 @@ class MongoHelper:
         return _id
     
     def findAll(self):
-        data=[ self.serialiseObject(document) for document in self.db_coll_name.find()]
+        data=[self.serialiseObject(document) for document in self.db_coll_name.find()]
         return data
     
     def findByFilter(self, filter):
-        data=[ self.serialiseObject(document) for document in self.db_coll_name.find(filter)]
+        data=[self.serialiseObject(document) for document in self.db_coll_name.find(filter)]
         return data
     
     def findById(self, id):
