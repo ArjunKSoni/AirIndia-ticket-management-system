@@ -3,12 +3,12 @@ from .models import PlaneInfo
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from ticket.models import Ticket
-from permission_decorators import is_staff, is_ticket_counter_staff, is_admin
+from permission_decorators import isAuthorized
 import json
 # Create your views here.
 
 @csrf_exempt
-@is_admin
+@isAuthorized("admin")
 def register_plain(request):
     if request.method == 'POST':
         try:
@@ -40,14 +40,14 @@ def register_plain(request):
 
 
 
-@is_ticket_counter_staff
+@isAuthorized("ticket_counter")
 def get_all_planes(request):
     planes = PlaneInfo.findAll()
     print(planes)
     return JsonResponse({"planes":planes})
 
 
-@is_staff
+@isAuthorized("staff")
 def get_ticket_by_plane_id(request, id):
     if request.method == 'GET':
         tickets = Ticket.findByFilter({"plane_id":id})
@@ -55,7 +55,7 @@ def get_ticket_by_plane_id(request, id):
     return JsonResponse({"error":"method not supported"})
 
 @csrf_exempt
-@is_admin
+@isAuthorized("admin")
 def update_plane_status(request):
     if request.method == 'PUT':
         data = json.loads(request.body)

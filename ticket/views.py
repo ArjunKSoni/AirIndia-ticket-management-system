@@ -5,12 +5,12 @@ from django.http import JsonResponse
 import json
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
-from permission_decorators import is_ticket_counter_staff, is_customer
+from permission_decorators import isAuthorized
 # Create your views here.
 
 
 @csrf_exempt
-@is_ticket_counter_staff
+@isAuthorized("ticket_counter")
 def book_ticket(request):
     if request.method == "POST":
         data = json.loads(request.body)
@@ -54,7 +54,7 @@ def book_ticket(request):
 
     return JsonResponse({"error":"method not supported"})
 
-@is_customer
+@isAuthorized("customer")
 def get_ticket_details(request, id):
     if request.method == "GET":
         try:

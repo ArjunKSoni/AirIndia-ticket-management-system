@@ -6,7 +6,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from django.contrib.auth.models import Group
 from ticket.models import Ticket
-from permission_decorators import is_staff, is_customer, is_ticket_counter_staff
+from permission_decorators import isAuthorized
 import jwt
 import json
 # Create your views here.
@@ -74,7 +74,7 @@ def user_login(request):
 
 
 @csrf_exempt
-@is_staff
+@isAuthorized("staff")
 def verify(request):
     if request.method == 'POST':
         data = json.loads(request.body)
@@ -88,7 +88,7 @@ def verify(request):
             return JsonResponse({"error":"invalid token"})
     return JsonResponse({"error":"method not supported"})
 
-@is_ticket_counter_staff
+@isAuthorized("ticket_counter")
 def get_user(request, id):
     if request.method == 'GET':
         try:
@@ -105,7 +105,7 @@ def get_user(request, id):
     return JsonResponse({"error":"method not supported"})
 
 
-@is_customer
+@isAuthorized("customer")
 def get_ticket_by_userid(request):
     if request.method == 'GET':
         try:
